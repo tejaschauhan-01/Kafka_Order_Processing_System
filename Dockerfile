@@ -1,14 +1,32 @@
-# Use official Java 21 runtime
-FROM eclipse-temurin:21-jdk
+# ============================
+# Stage 1: Build the application
+# ============================
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
+# Set working directory
 WORKDIR /app
 
-# Copy Maven build files
+# Copy Maven configuration and source code
 COPY pom.xml .
 COPY src ./src
 
-# Install Maven and build the JAR
-RUN apt-get update && apt-get install -y maven && mvn -f pom.xml clean package -DskipTests
+# Build the application JAR (skip tests to save time)
+RUN mvn clean package -DskipTests
 
-# Run the Spring Boot JAR
-ENTRYPOINT ["java", "-jar", "/app/target/kafka-order-system-1.0.0.jar"]
+
+# ============================
+# Stage 2: Run the application
+# ============================
+FROM eclipse-temurin:21-jdk
+
+# Set working directory for the runtime container
+WORKDIR /app
+
+# Copy only the built JAR from the previous stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose the Spring Boot app port
+EXPOSE 8080
+
+# Run the JAR file
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,4 +1,4 @@
-package com.KafkaOrderProcessingSystem.OrderProcessingSystem.Entity;
+package com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity;
 
 
 import lombok.AllArgsConstructor;

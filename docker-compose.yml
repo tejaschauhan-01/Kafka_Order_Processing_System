@@ -42,4 +42,4 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/kafka_order_system
 
 volumes:
-  mongo-data:
+  mongo-data: 

@@ -1,8 +1,8 @@
-package com.KafkaOrderProcessingSystem.OrderProcessingSystem.Service.Impl;
+package com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.Impl;
 
-import com.KafkaOrderProcessingSystem.OrderProcessingSystem.Entity.Order;
-import com.KafkaOrderProcessingSystem.OrderProcessingSystem.Repository.OrderRepository;
-import com.KafkaOrderProcessingSystem.OrderProcessingSystem.Service.OrderProducerService;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepository;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.OrderProducerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

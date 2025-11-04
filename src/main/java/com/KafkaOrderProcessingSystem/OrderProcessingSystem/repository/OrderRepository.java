@@ -1,6 +1,6 @@
-package com.KafkaOrderProcessingSystem.OrderProcessingSystem.Repository;
+package com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository;
 
-import com.KafkaOrderProcessingSystem.OrderProcessingSystem.Entity.Order;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface OrderRepository extends MongoRepository<Order, String> {

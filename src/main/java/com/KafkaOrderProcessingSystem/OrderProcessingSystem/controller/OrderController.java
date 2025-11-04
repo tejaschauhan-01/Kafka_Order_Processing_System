@@ -1,7 +1,7 @@
-package com.KafkaOrderProcessingSystem.OrderProcessingSystem.Controller;
+package com.KafkaOrderProcessingSystem.OrderProcessingSystem.controller;
 
-import com.KafkaOrderProcessingSystem.OrderProcessingSystem.Entity.Order;
-import com.KafkaOrderProcessingSystem.OrderProcessingSystem.Service.Impl.OrderProducerServiceImpl;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.Impl.OrderProducerServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

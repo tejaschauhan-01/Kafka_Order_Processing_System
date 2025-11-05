@@ -44,6 +44,7 @@ public class OrderProducerServiceImpl implements OrderProducerService {
         }
         catch (Exception e){
             log.info("error is the "+e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
 
     }

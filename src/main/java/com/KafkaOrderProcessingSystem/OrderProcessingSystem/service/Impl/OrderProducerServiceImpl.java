@@ -23,7 +23,7 @@ public class OrderProducerServiceImpl implements OrderProducerService {
 
     @Override
     public void submitOrder(Order order) {
-        order.setStatus("RECEIVED");
+//        order.setStatus("PENDING");
         orderRepository.save(order);
 
         kafkaTemplate.send(TOPIC, order.getOrderId() , order);

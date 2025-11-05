@@ -1,5 +1,7 @@
 package com.KafkaOrderProcessingSystem.OrderProcessingSystem.controller;
 
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.OrderResponseDTO;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.WarehouseStockDTO;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStock;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.InventoryService;
 import jakarta.validation.Valid;
@@ -17,9 +19,17 @@ public class InventoryController {
     private InventoryService inventoryService;
 
     @PostMapping("/add_inventory")
-    public ResponseEntity<?> addInventory(@Valid @RequestBody WarehouseStock warehouseStock){
+    public ResponseEntity<?> addInventory(@Valid @RequestBody WarehouseStockDTO warehouseStockDTO){
+        WarehouseStock warehouseStock = new WarehouseStock(
+                warehouseStockDTO.getProductName(),
+                warehouseStockDTO.getAvailableQuantity()
+        );
         inventoryService.addInventory(warehouseStock);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new WarehouseStockDTO(
+                warehouseStockDTO.getProductName(),
+                warehouseStockDTO.getAvailableQuantity(),
+                "Stock Added Succesfully"
+        ));
     }
 
     @GetMapping("/getInventory")

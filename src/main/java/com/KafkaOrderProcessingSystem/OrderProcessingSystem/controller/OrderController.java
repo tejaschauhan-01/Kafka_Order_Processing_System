@@ -1,5 +1,7 @@
 package com.KafkaOrderProcessingSystem.OrderProcessingSystem.controller;
 
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.OrderRequestDTO;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.OrderResponseDTO;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStock;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepository;
@@ -12,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
@@ -25,32 +25,31 @@ public class OrderController {
     @Autowired
     private final OrderProducerServiceImpl orderProducerService;
 
-    @GetMapping
-    public String getstr()
-    {
-        return "tejas";
-    }
-
     @PostMapping
-    public ResponseEntity<?> createOrder(@Valid @RequestBody Order order) {
-//        Optional<WarehouseStock> stockOpt = warehouseRepository.findById(order.getProductName());
-//        if(stockOpt.isEmpty()){
-//            return ResponseEntity.badRequest().body("Product '" + order.getOrderId() + "' not ofund in stock!");
-//        }
+    public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO) {
+        Order order = new Order(
+                orderRequestDTO.getOrderId(),
+                orderRequestDTO.getProductName(),
+                orderRequestDTO.getQuantity(),
+                orderRequestDTO.getStatus()
+        );
         try{
             orderProducerService.submitOrder(order);
-            return ResponseEntity.ok("Order submitted successfully");
+            Order receivedOrder = orderRepository.findById(order.getOrderId()).get();
+            return ResponseEntity.ok(new OrderResponseDTO(
+                    receivedOrder.getOrderId(),
+                    receivedOrder.getProductName(),
+                    receivedOrder.getQuantity(),
+                    receivedOrder.getStatus(),
+                    "Order submitted successfully"
+            ));
         }
         catch (IllegalArgumentException e)
         {
             return ResponseEntity.badRequest().body("Invalid order data: " + e.getMessage());
         } catch (RuntimeException e) {
-            // For business or service exceptions
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Failed to submit order: " + e.getMessage());
         }
-
-
     }
-
 }

@@ -23,7 +23,6 @@ public class WarehouseServiceImpl implements WarehouseService {
             order.setStatus("FAILED");
             orderRepository.save(order);
             throw new RuntimeException("not able to find product"+order.getProductName());
-//            return;
         }
         WarehouseStock stock = stockOptional.get();
         int remaining= stock.getAvailableQuantity()-order.getQuantity();
@@ -31,7 +30,6 @@ public class WarehouseServiceImpl implements WarehouseService {
             order.setStatus("FAILED");
             orderRepository.save(order);
             throw new RuntimeException("Out of Stock");
-//            return;
         }
         stock.setAvailableQuantity(remaining);
         warehouseRepository.save(stock);

@@ -30,13 +30,5 @@ public class WarehouseConsumerServiceImpl implements WarehouseConsumerService {
                 log.error("Exception while processing order "+e.getMessage());
                 throw new RuntimeException(e.getMessage());
             }
-
-//        WarehouseStock stock = warehouseRepository.findById(order.getProductName())
-//                .orElse(new WarehouseStock(order.getProductName(), 100));
-//
-//        stock.setAvailableQuantity(stock.getAvailableQuantity() - order.getQuantity());
-//        warehouseRepository.save(stock);
-//
-//        System.out.println("🏪 Updated stock for " + order.getProductName() + ": " + stock.getAvailableQuantity());
     }
 }

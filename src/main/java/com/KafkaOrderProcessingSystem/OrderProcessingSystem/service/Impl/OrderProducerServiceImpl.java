@@ -1,17 +1,19 @@
 package com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.Impl;
 
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStock;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepository;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.WarehouseRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.OrderProducerService;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -25,6 +27,9 @@ public class OrderProducerServiceImpl implements OrderProducerService {
     @Autowired
     private ProducerFactory<?, ?> producerFactory;
 
+    @Autowired
+    private WarehouseRepository warehouseRepository;
+
     @PostConstruct
     public void printKafkaConfig() {
         System.out.println("Producer value serializer: " +
@@ -35,7 +40,21 @@ public class OrderProducerServiceImpl implements OrderProducerService {
 
     @Override
     public void submitOrder(Order order) {
-//        order.setStatus("PENDING");
+        Optional<WarehouseStock> stockOpt = warehouseRepository.findById(order.getProductName());
+        if(stockOpt.isEmpty()){
+            throw new RuntimeException("Product not found");
+        }
+        WarehouseStock stock = stockOpt.get();
+        int remaining= stock.getAvailableQuantity()-order.getQuantity();
+        if(remaining<0){
+            order.setStatus("FAILED");
+            orderRepository.save(order);
+            throw new RuntimeException("Out of Stock");
+        }
+
+        if(order.getQuantity() < stock.getAvailableQuantity()){
+            order.setStatus("PROCESSED");
+        }
         orderRepository.save(order);
         try{
             log.info("data hase been save in database");
@@ -46,6 +65,5 @@ public class OrderProducerServiceImpl implements OrderProducerService {
             log.info("error is the "+e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
-
     }
 }

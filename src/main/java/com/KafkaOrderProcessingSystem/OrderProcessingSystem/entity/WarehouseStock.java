@@ -1,4 +1,5 @@
-package com.KafkaOrderProcessingSystem.OrderProcessingSystem.Entity;
+package com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,14 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "orders")
-public class Order {
+@Document(collection = "warehouse_stock")
+public class WarehouseStock {
 
     @Id
-    private String orderId;
-
     private String productName;
-
-    private int quantity;
-
+    
+    private int availableQuantity;
 }

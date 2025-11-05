@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class OrderProducerServiceImpl implements OrderProducerService {
-//    @Bean
+    // @Bean
     private final KafkaTemplate<String, Order> kafkaTemplate;
     @Autowired
     private OrderRepository orderRepository;
@@ -35,8 +35,7 @@ public class OrderProducerServiceImpl implements OrderProducerService {
 
     @Override
     public void submitOrder(Order order) {
-        log.info("controller  is sa started");
-        order.setStatus("RECEIVED");
+//        order.setStatus("PENDING");
         orderRepository.save(order);
         try{
             log.info("data hase been save in database");

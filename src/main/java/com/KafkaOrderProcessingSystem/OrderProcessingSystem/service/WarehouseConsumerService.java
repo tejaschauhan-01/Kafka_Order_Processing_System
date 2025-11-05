@@ -23,6 +23,6 @@ public class WarehouseConsumerService {
         stock.setAvailableQuantity(stock.getAvailableQuantity() - order.getQuantity());
         warehouseRepository.save(stock);
 
-        System.out.println("🏪 Updated stock for " + order.getProductName() + ": " + stock.getAvailableQuantity());
+        System.out.println("🏪 Updated stock for a " + order.getProductName() + ": " + stock.getAvailableQuantity());
     }
 }

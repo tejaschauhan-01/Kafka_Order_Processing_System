@@ -6,7 +6,9 @@ services:
     container_name: kafka
     ports:
       - "9092:9092"
-    environment:
+    environment:   #configuration properties : - these are environment variables for config kafka (which are built in, you can customize it based on your requirements), you can also add custom variable for own use.
+
+      # Kafka Configuration
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
@@ -39,7 +41,10 @@ services:
       - mongodb
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/kafka_order_system
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/warehouse_db
 
 volumes:
   mongo-data: 
+
+# we can also specify the environment variable in .env and use in compose file for safe and private purpose. so you commit compose file not .env, right!!!
+#  docker exec -it mongodb mongosh

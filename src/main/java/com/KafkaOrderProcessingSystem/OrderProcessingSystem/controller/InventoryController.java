@@ -20,21 +20,53 @@ public class InventoryController {
 
     @PostMapping("/add_inventory")
     public ResponseEntity<?> addInventory(@Valid @RequestBody WarehouseStockDTO warehouseStockDTO){
-        WarehouseStock warehouseStock = new WarehouseStock(
-                warehouseStockDTO.getProductName(),
-                warehouseStockDTO.getAvailableQuantity()
-        );
-        inventoryService.addInventory(warehouseStock);
-        return ResponseEntity.ok(new WarehouseStockDTO(
-                warehouseStockDTO.getProductName(),
-                warehouseStockDTO.getAvailableQuantity(),
-                "Stock Added Succesfully"
-        ));
+        try{
+            WarehouseStock warehouseStock = new WarehouseStock(
+                    warehouseStockDTO.getProductName(),
+                    warehouseStockDTO.getAvailableQuantity()
+            );
+            inventoryService.addInventory(warehouseStock);
+            return ResponseEntity.ok(new WarehouseStockDTO(
+                    warehouseStockDTO.getProductName(),
+                    warehouseStockDTO.getAvailableQuantity(),
+                    "Stock Added Succesfully"
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new WarehouseStockDTO(
+                    warehouseStockDTO.getProductName(),
+                    warehouseStockDTO.getAvailableQuantity(),
+                    e.getMessage()
+            ));
+        }
     }
 
     @GetMapping("/getInventory")
     public ResponseEntity<?> getInventory(){
         List <WarehouseStock> stocks = inventoryService.getInventory();
         return ResponseEntity.ok().body(stocks);
+    }
+
+    @PutMapping("/update_inventory/{productName}")
+    public ResponseEntity<?> updateInventory(
+            @Valid @RequestBody WarehouseStockDTO warehouseStockDTO,
+            @PathVariable String productName){
+        try {
+            WarehouseStock updateStock = inventoryService.updateInventory(
+                    productName,
+                    warehouseStockDTO.getProductName(),
+                    warehouseStockDTO.getAvailableQuantity()
+            );
+            return ResponseEntity.ok(new WarehouseStockDTO(
+                    updateStock.getProductName(),
+                    updateStock.getAvailableQuantity(),
+                    "Inventory updated Succesfully"
+            ));
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(new WarehouseStockDTO(
+                    warehouseStockDTO.getProductName(),
+                    warehouseStockDTO.getAvailableQuantity(),
+                    e.getMessage()
+            ));
+        }
     }
 }

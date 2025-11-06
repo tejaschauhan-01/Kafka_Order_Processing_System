@@ -22,8 +22,6 @@ public class WarehouseStockUpdate {
         WarehouseStock stock = stockOptional.get();
         int remaining = stock.getAvailableQuantity() - order.getQuantity();
         stock.setAvailableQuantity(remaining);
-
-
         warehouseRepository.save(stock);
         log.info("warehouse has been updated with with " + stock);
     }

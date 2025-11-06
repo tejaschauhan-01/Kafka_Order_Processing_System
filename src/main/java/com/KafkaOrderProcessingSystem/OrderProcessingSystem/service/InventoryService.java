@@ -10,4 +10,6 @@ public interface InventoryService {
     void addInventory(WarehouseStock warehouseStock);
 
     List<WarehouseStock> getInventory();
+
+    WarehouseStock updateInventory(String existingProductName, String newProductName, int additionalQuantity);
 }

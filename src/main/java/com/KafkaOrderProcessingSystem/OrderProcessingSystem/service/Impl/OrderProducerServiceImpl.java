@@ -19,22 +19,14 @@ import java.util.Optional;
 @AllArgsConstructor
 @Slf4j
 public class OrderProducerServiceImpl implements OrderProducerService {
-    // @Bean
+
     private final KafkaTemplate<String, Order> kafkaTemplate;
+
     @Autowired
     private OrderRepository orderRepository;
 
     @Autowired
-    private ProducerFactory<?, ?> producerFactory;
-
-    @Autowired
     private WarehouseRepository warehouseRepository;
-
-    @PostConstruct
-    public void printKafkaConfig() {
-        System.out.println("Producer value serializer: " +
-                producerFactory.getConfigurationProperties().get("value.serializer"));
-    }
 
     private static final String TOPIC = "orders";
 

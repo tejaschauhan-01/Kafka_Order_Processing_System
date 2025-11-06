@@ -44,21 +44,24 @@ public class OrderProducerServiceImpl implements OrderProducerService {
         if(stockOpt.isEmpty()){
             throw new RuntimeException("Product not found");
         }
+
         WarehouseStock stock = stockOpt.get();
-        int remaining= stock.getAvailableQuantity()-order.getQuantity();
-        if(remaining<0){
-            order.setStatus("FAILED");
-            orderRepository.save(order);
-            throw new RuntimeException("Out of Stock");
+
+        if (stock.getAvailableQuantity() <= 0) {
+            handleOrderStatus(order, "FAILED", "Out of Stock", true);
+        }
+        else if (order.getQuantity() > stock.getAvailableQuantity()) {
+            handleOrderStatus(order, "FAILED",
+                    "Order Quantity exceeds available stock: " + stock.getAvailableQuantity(),
+                    true);
+        }
+        else {
+            handleOrderStatus(order, "PROCESSED", null, false);
         }
 
-        if(order.getQuantity() < stock.getAvailableQuantity()){
-            order.setStatus("PROCESSED");
-        }
-        orderRepository.save(order);
         try{
-            log.info("data hase been save in database");
-            kafkaTemplate.send(TOPIC, order.getOrderId() , order);
+            log.info("data hase been save in Order database");
+           kafkaTemplate.send(TOPIC, order.getOrderId() , order);
             log.info("Order saved (RECEIVED) and sent to Kafka: " + order);
         }
         catch (Exception e){
@@ -66,4 +69,13 @@ public class OrderProducerServiceImpl implements OrderProducerService {
             throw new RuntimeException(e.getMessage());
         }
     }
+    private void handleOrderStatus(Order order, String status, String message, boolean throwException) {
+        order.setStatus(status);
+        orderRepository.save(order);
+
+        if (throwException) {
+            throw new RuntimeException(message);
+        }
+    }
+
 }

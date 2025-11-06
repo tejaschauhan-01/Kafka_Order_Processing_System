@@ -9,7 +9,6 @@ import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,7 +20,6 @@ public class Order {
     private String productName;
     @Min(value=1, message = "Quantity must be at least 1")
     private int quantity;
-
     private String status;
 
 }

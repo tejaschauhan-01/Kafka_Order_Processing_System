@@ -33,7 +33,7 @@ public class OrderController {
                 orderRequestDTO.getQuantity(),
                 orderRequestDTO.getStatus()
         );
-        try{
+        try {
             orderProducerService.submitOrder(order);
             Order receivedOrder = orderRepository.findById(order.getOrderId()).get();
             return ResponseEntity.ok(new OrderResponseDTO(
@@ -43,9 +43,7 @@ public class OrderController {
                     receivedOrder.getStatus(),
                     "Order submitted successfully"
             ));
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Invalid order data: " + e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

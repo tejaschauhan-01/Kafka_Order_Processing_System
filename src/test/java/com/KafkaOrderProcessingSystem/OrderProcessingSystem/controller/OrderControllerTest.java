@@ -47,7 +47,7 @@ class OrderControllerTest {
         Mockito.doNothing().when(orderProducerService).submitOrder(any(Order.class));
         Mockito.when(orderRepository.findById("O1")).thenReturn(Optional.of(order));
 
-        mockMvc.perform(post("/orders")
+        mockMvc.perform(post("/orders/create_order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
@@ -65,7 +65,7 @@ class OrderControllerTest {
         Mockito.doThrow(new IllegalArgumentException("Invalid product name"))
                 .when(orderProducerService).submitOrder(any(Order.class));
 
-        mockMvc.perform(post("/orders")
+        mockMvc.perform(post("/orders/create_order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
@@ -79,7 +79,7 @@ class OrderControllerTest {
         Mockito.doThrow(new RuntimeException("Out of stock"))
                 .when(orderProducerService).submitOrder(any(Order.class));
 
-        mockMvc.perform(post("/orders")
+        mockMvc.perform(post("/orders/create_order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())

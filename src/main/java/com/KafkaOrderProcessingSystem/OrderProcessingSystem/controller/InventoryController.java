@@ -1,9 +1,9 @@
 package com.KafkaOrderProcessingSystem.OrderProcessingSystem.controller;
 
-import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.OrderResponseDTO;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.WarehouseStockDTO;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStock;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.InventoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Inventory Endpoints")
 @RestController
 @RequestMapping("/inventory")
 public class InventoryController {
@@ -18,7 +19,7 @@ public class InventoryController {
     @Autowired
     private InventoryService inventoryService;
 
-    @PostMapping("/add_inventory")
+    @PostMapping("/add_stock")
     public ResponseEntity<?> addInventory(@Valid @RequestBody WarehouseStockDTO warehouseStockDTO){
         try{
             WarehouseStock warehouseStock = new WarehouseStock(
@@ -40,13 +41,13 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("/getInventory")
+    @GetMapping("/stock_list")
     public ResponseEntity<?> getInventory(){
         List <WarehouseStock> stocks = inventoryService.getInventory();
         return ResponseEntity.ok().body(stocks);
     }
 
-    @PutMapping("/update_inventory/{productName}")
+    @PutMapping("/update_stock/{productName}")
     public ResponseEntity<?> updateInventory(
             @Valid @RequestBody WarehouseStockDTO warehouseStockDTO,
             @PathVariable String productName){

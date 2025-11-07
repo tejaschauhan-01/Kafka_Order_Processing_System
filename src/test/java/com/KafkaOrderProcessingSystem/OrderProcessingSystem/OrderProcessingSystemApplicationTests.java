@@ -10,5 +10,4 @@ class OrderProcessingSystemApplicationTests {
 	void contextLoads() {
 
 	}
-
 }

@@ -45,7 +45,7 @@ class InventoryControllerTest {
 
         doNothing().when(inventoryService).addInventory(any(WarehouseStock.class));
 
-        mockMvc.perform(post("/inventory/add_inventory")
+        mockMvc.perform(post("/inventory/add_stock")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -61,7 +61,7 @@ class InventoryControllerTest {
         doThrow(new IllegalArgumentException("Duplicate product")).when(inventoryService)
                 .addInventory(any(WarehouseStock.class));
 
-        mockMvc.perform(post("/inventory/add_inventory")
+        mockMvc.perform(post("/inventory/add_stock")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
@@ -77,7 +77,7 @@ class InventoryControllerTest {
 
         when(inventoryService.getInventory()).thenReturn(stocks);
 
-        mockMvc.perform(get("/inventory/getInventory"))
+        mockMvc.perform(get("/inventory/stock_list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].productName").value("Laptop"))
                 .andExpect(jsonPath("$[1].productName").value("Mouse"));
@@ -91,7 +91,7 @@ class InventoryControllerTest {
         when(inventoryService.updateInventory(eq("Laptop"), anyString(), anyInt()))
                 .thenReturn(updated);
 
-        mockMvc.perform(put("/inventory/update_inventory/Laptop")
+        mockMvc.perform(put("/inventory/update_stock/Laptop")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -107,7 +107,7 @@ class InventoryControllerTest {
         when(inventoryService.updateInventory(eq("Laptop"), anyString(), anyInt()))
                 .thenThrow(new IllegalArgumentException("Product not found"));
 
-        mockMvc.perform(put("/inventory/update_inventory/Laptop")
+        mockMvc.perform(put("/inventory/update_stock/Laptop")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())

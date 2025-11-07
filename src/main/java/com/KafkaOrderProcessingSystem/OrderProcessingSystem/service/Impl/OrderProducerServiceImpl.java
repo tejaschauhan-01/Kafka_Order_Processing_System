@@ -5,12 +5,10 @@ import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStoc
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.WarehouseRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.OrderProducerService;
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

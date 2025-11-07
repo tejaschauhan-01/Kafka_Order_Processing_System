@@ -14,12 +14,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Document(collection = "orders")
 public class Order {
+
     @Id
     private String orderId;
+
     @NotBlank(message="product name required")
     private String productName;
+
     @Min(value=1, message = "Quantity must be at least 1")
     private int quantity;
+
     private String status;
 
 }

@@ -3,10 +3,9 @@ package com.KafkaOrderProcessingSystem.OrderProcessingSystem.controller;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.OrderRequestDTO;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.OrderResponseDTO;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
-import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStock;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepository;
-import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.WarehouseRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.Impl.OrderProducerServiceImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +13,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Order Endpoints")
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
+
     @Autowired
     private OrderRepository orderRepository;
-    @Autowired
-    private WarehouseRepository warehouseRepository;
+
     @Autowired
     private final OrderProducerServiceImpl orderProducerService;
 
-    @PostMapping
+    @PostMapping("/create_order")
     public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO) {
         Order order = new Order(
                 orderRequestDTO.getOrderId(),

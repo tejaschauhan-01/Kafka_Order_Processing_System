@@ -8,5 +8,6 @@ class OrderProcessingSystemApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 }

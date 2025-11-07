@@ -31,7 +31,7 @@ public class OrderProducerServiceImpl implements OrderProducerService {
     @Override
     public void submitOrder(Order order) {
         Optional<WarehouseStock> stockOpt = warehouseRepository.findById(order.getProductName());
-        if(stockOpt.isEmpty()){
+        if (stockOpt.isEmpty()) {
             throw new RuntimeException("Product not found");
         }
 
@@ -39,26 +39,24 @@ public class OrderProducerServiceImpl implements OrderProducerService {
 
         if (stock.getAvailableQuantity() <= 0) {
             handleOrderStatus(order, "FAILED", "Out of Stock", true);
-        }
-        else if (order.getQuantity() > stock.getAvailableQuantity()) {
+        } else if (order.getQuantity() > stock.getAvailableQuantity()) {
             handleOrderStatus(order, "FAILED",
                     "Order Quantity exceeds available stock: " + stock.getAvailableQuantity(),
                     true);
-        }
-        else {
+        } else {
             handleOrderStatus(order, "PROCESSED", null, false);
         }
 
-        try{
+        try {
             log.info("data hase been save in Order database");
-           kafkaTemplate.send(TOPIC, order.getOrderId() , order);
+            kafkaTemplate.send(TOPIC, order.getOrderId(), order);
             log.info("Order saved (RECEIVED) and sent to Kafka: " + order);
-        }
-        catch (Exception e){
-            log.info("error is the "+e.getMessage());
+        } catch (Exception e) {
+            log.info("error is the " + e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
+
     private void handleOrderStatus(Order order, String status, String message, boolean throwException) {
         order.setStatus(status);
         orderRepository.save(order);

@@ -73,6 +73,15 @@ Contains the core business logic and Kafka message handling.
 
 ---
 
+## 🧮 System Design Diagrams
+
+To better visualize the architecture and flow of the Kafka Order Processing System, several UML diagrams have been included.
+
+All diagrams are located in:
+📁 src/main/resources/diagrams/
+
+---
+
 ## 🐳 Running the Application with Docker
 
 ### 1️⃣ Build and Start Containers

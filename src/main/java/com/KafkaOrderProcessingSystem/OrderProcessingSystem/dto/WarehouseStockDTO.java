@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+// DTO for Warehouse Stock, common for both request and response.
 public class WarehouseStockDTO {
 
     @NotBlank(message = "product  name required")

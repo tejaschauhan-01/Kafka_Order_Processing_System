@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
+// DTO for Order Request
 public class OrderRequestDTO {
 
     private String orderId;

@@ -34,16 +34,12 @@ public class InventoryServiceImplTest {
         productStock.setProductName("Laptop");
         productStock.setAvailableQuantity(10);
     }
-
     @Test
     void testAddInventory_NewProduct_Success() {
         when(warehouseRepository.findById("Laptop")).thenReturn(Optional.empty());
-
         inventoryService.addInventory(productStock);
-
         verify(warehouseRepository, times(1)).save(productStock);
     }
-
     @Test
     void testAddInventory_ProductAlreadyExists_ThrowsException() {
         when(warehouseRepository.findById("Laptop")).thenReturn(Optional.of(productStock));

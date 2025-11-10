@@ -22,7 +22,6 @@ class WarehouseConsumerServiceImplTest {
 
     @Test
     void ConsumeOrder_ShouldCallWarehouseStockUpdateTest() {
-
         Order mockOrder = new Order();
         mockOrder.setOrderId("223");
         mockOrder.setProductName("Laptop");

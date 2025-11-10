@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class SwaggerConfig {
 
     @Bean
-    public OpenAPI myCustomConfig(){
+    public OpenAPI myCustomConfig() {
         return new OpenAPI()
                 .info(
                         new Info().title("Kafka Ordering System APIs")

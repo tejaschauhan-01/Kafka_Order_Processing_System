@@ -17,8 +17,10 @@ public class WarehouseStockUpdate {
     private WarehouseRepository warehouseRepository;
 
     public void processOrder(Order order) {
+
         log.info("kafka consumer received order: " + order);
         Optional<WarehouseStock> stockOptional = warehouseRepository.findById(order.getProductName());
+
         WarehouseStock stock = stockOptional.get();
         int remaining = stock.getAvailableQuantity() - order.getQuantity();
         stock.setAvailableQuantity(remaining);

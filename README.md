@@ -40,6 +40,64 @@ The entire system runs in **Docker containers** - no ZooKeeper required (Kafka K
 
 ## 🧩 Project Structure Overview
 
+### Project structure (directory tree)
+
+```
+Kafka_Order_Processing_System/
+├─ docker-compose.yml
+├─ Dockerfile
+├─ HELP.md
+├─ mvnw
+├─ mvnw.cmd
+├─ pom.xml
+├─ README.md
+├─ src/
+│  ├─ main/
+│  │  ├─ java/
+│  │  │  └─ com/KafkaOrderProcessingSystem/OrderProcessingSystem/
+│  │  │     ├─ GlobalExceptionHandler.java
+│  │  │     ├─ OrderProcessingSystemApplication.java
+│  │  │     ├─ config/
+│  │  │     │  └─ SwaggerConfig.java
+│  │  │     ├─ controller/
+│  │  │     │  ├─ InventoryController.java
+│  │  │     │  └─ OrderController.java
+│  │  │     ├─ dto/
+│  │  │     │  ├─ OrderRequestDTO.java
+│  │  │     │  ├─ OrderResponseDTO.java
+│  │  │     │  └─ WarehouseStockDTO.java
+│  │  │     ├─ entity/
+│  │  │     │  ├─ Order.java
+│  │  │     │  └─ WarehouseStock.java
+│  │  │     ├─ repository/
+│  │  │     │  ├─ OrderRepository.java
+│  │  │     │  └─ WarehouseRepository.java
+│  │  │     ├─ service/
+│  │  │     │  ├─ InventoryService.java
+│  │  │     │  ├─ OrderProducerService.java
+│  │  │     │  ├─ WarehouseConsumerService.java
+│  │  │     │  └─ Impl/
+│  │  │     │     ├─ InventoryServiceImpl.java
+│  │  │     │     ├─ OrderProducerServiceImpl.java
+│  │  │     │     └─ WarehouseConsumerServiceImpl.java
+│  │  │     └─ utils/
+│  │  │        └─ WarehouseStockUpdate.java
+│  │  └─ resources/
+│  │     ├─ application.yaml
+│  │     └─ diagrams/
+│  │        ├─ ActivityDiagram_InventoryManagemant.png
+│  │        ├─ ActivityDiagram_OrderProducer.png
+│  │        ├─ ActivityDiagram_WarehouseConsumer.png
+│  │        ├─ ClassDiagram.png
+│  │        └─ SequenceDiagram.png
+│  └─ test/
+│     └─ java/
+│        └─ com/KafkaOrderProcessingSystem/OrderProcessingSystem/
+│           ├─ OrderProcessingSystemApplicationTests.java
+│           └─ (controller, service tests...)
+└─ target/ (build output)
+```
+
 The project follows a **modular layered architecture**, organized into the following components:
 
 ### **1. Controller Layer (`controller/`)**

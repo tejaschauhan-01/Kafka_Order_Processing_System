@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
+// DTO for Order Request
 public class OrderRequestDTO {
 
     private String orderId;
@@ -21,6 +22,5 @@ public class OrderRequestDTO {
     private int quantity;
     @NotBlank(message = "status required")
     @Pattern(regexp = "^(PENDING|COMPLETED|FAILED)$", message = "Status must be PENDING, COMPLETED, or FAILED")
-
     private String status;
 }

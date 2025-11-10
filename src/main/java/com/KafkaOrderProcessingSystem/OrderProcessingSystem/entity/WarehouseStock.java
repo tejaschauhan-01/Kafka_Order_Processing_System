@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "warehouse_stock")
+// Entity class for Warehouse Stock
 public class WarehouseStock {
 
     @Id

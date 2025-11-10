@@ -13,18 +13,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// REST controller for order processing operations.
+// Handles requests related to creating and submitting orders.
 @Tag(name = "Order Endpoints")
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
-
+    // Repository for order data access operations with mongoDB database.
     @Autowired
     private OrderRepository orderRepository;
-
+    // Service for producing and submitting orders to Kafka broker.
     @Autowired
     private final OrderProducerServiceImpl orderProducerService;
-
+    // Endpoint to create and submit a new order.
+    // Receives an OrderRequestDTO in the request body and returns a response indicating success or failure.
     @PostMapping("/create_order")
     public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO) {
         Order order = new Order(
@@ -34,6 +37,7 @@ public class OrderController {
                 orderRequestDTO.getStatus()
         );
         try{
+            // Submit the order using the order producer service.
             orderProducerService.submitOrder(order);
             Order receivedOrder = orderRepository.findById(order.getOrderId()).get();
             return ResponseEntity.ok(new OrderResponseDTO(
@@ -46,6 +50,7 @@ public class OrderController {
         }
         catch (IllegalArgumentException e)
         {
+            // Return a bad request response with the error message if an exception occurs.
             return ResponseEntity.badRequest().body("Invalid order data: " + e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

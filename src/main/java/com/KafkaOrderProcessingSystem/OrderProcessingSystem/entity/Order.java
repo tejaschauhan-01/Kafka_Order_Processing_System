@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "orders")
+// Entity class for Order
 public class Order {
 
     @Id

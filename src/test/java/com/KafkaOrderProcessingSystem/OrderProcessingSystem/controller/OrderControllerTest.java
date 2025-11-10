@@ -41,7 +41,7 @@ class OrderControllerTest {
 
     @Test
     void testCreateOrder_Success() throws Exception {
-        OrderRequestDTO requestDTO = new OrderRequestDTO("O1", "Laptop", 5, "RECEIVED");
+        OrderRequestDTO requestDTO = new OrderRequestDTO("O1", "Laptop", 5, "PENDING");
         Order order = new Order("O1", "Laptop", 5, "PROCESSED");
 
         Mockito.doNothing().when(orderProducerService).submitOrder(any(Order.class));
@@ -60,7 +60,7 @@ class OrderControllerTest {
 
     @Test
     void testCreateOrder_InvalidData() throws Exception {
-        OrderRequestDTO requestDTO = new OrderRequestDTO("O2", "Phone", 10, "RECEIVED");
+        OrderRequestDTO requestDTO = new OrderRequestDTO("O2", "Phone", 10, "PENDING");
 
         Mockito.doThrow(new IllegalArgumentException("Invalid product name"))
                 .when(orderProducerService).submitOrder(any(Order.class));
@@ -74,7 +74,7 @@ class OrderControllerTest {
 
     @Test
     void testCreateOrder_RuntimeException() throws Exception {
-        OrderRequestDTO requestDTO = new OrderRequestDTO("O3", "Tablet", 2, "RECEIVED");
+        OrderRequestDTO requestDTO = new OrderRequestDTO("O3", "Tablet", 2, "PENDING");
 
         Mockito.doThrow(new RuntimeException("Out of stock"))
                 .when(orderProducerService).submitOrder(any(Order.class));

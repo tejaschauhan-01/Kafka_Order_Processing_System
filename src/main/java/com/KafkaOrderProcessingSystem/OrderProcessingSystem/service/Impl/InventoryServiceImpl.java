@@ -3,6 +3,7 @@ package com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.Impl;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStock;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.WarehouseRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.InventoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,10 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class InventoryServiceImpl implements InventoryService {
 
-    @Autowired
-    private WarehouseRepository warehouseRepository;
+    private final WarehouseRepository warehouseRepository;
 
     @Override
     public void addInventory(WarehouseStock warehouseStock) {

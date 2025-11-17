@@ -18,10 +18,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class WarehouseStock {
 
     @Id
-    @NotBlank(message = "product name required")
-    @Pattern(regexp = "^[A-Za-z\\s]+$", message = "product name should not be number")
     private String productName;
-
-    @Min(value = 1, message = "Quantity must be at least 1")
     private int availableQuantity;
 }

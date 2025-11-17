@@ -39,7 +39,7 @@ public class InventoryServiceImpl implements InventoryService {
         // Check if the existing product is present in inventory
         Optional<WarehouseStock> existingOpt = warehouseRepository.findById(existingProductName);
         if (existingOpt.isEmpty()) {
-            throw new IllegalArgumentException("Product not found in inventory: " + existingProductName);
+            throw new RuntimeException("Product not found in inventory: " + existingProductName);
         }
 
         // Get the existing product record

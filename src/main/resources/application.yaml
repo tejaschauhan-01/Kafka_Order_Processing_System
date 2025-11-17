@@ -1,7 +1,11 @@
 spring:
   application:
     name: OrderProcessingSystem
-# at the end this app is also image which run on container , so that we can also configure the following props in compose, but not required.
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true   # to avoid errors for unknown properties in json
+
+  # at the end this app is also image which run on container , so that we can also configure the following props in compose, but not required.
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}   # if app not run on docker then use the localhost:<port> otherWise container environment variables which define in compose file.
     producer:

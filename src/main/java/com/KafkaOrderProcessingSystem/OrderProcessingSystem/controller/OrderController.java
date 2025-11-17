@@ -5,57 +5,53 @@ import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.OrderResponseDTO
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.Impl.OrderProducerServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-// REST controller for order processing operations.
-// Handles requests related to creating and submitting orders.
-@Tag(name = "Order Endpoints")
+
+@Tag(name = "Order Management", description = "APIs for managing and processing orders")
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
-    // Repository for order data access operations with mongoDB database.
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
-    // Service for producing and submitting orders to Kafka broker.
     private final OrderProducerServiceImpl orderProducerService;
 
-    // Endpoint to create and submit a new order.
-    // Receives an OrderRequestDTO in the request body and returns a response indicating success or failure.
+    @Operation(
+            summary = "Create a new order",
+            description = "Creates and submits a new order to the processing queue. The order will be validated and sent to Kafka for asynchronous processing."
+    )
     @PostMapping("/create_order")
-    public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO) {
+    public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO) {
+
+        // Map DTO to entity (following DTO pattern for clean separation)
         Order order = new Order(
                 orderRequestDTO.getOrderId(),
                 orderRequestDTO.getProductName(),
                 orderRequestDTO.getQuantity(),
                 orderRequestDTO.getStatus()
         );
-        try{
-            // Submit the order using the order producer service.
-            orderProducerService.submitOrder(order);
-            Order receivedOrder = orderRepository.findById(order.getOrderId()).get();
-            return ResponseEntity.ok(new OrderResponseDTO(
-                    receivedOrder.getOrderId(),
-                    receivedOrder.getProductName(),
-                    receivedOrder.getQuantity(),
-                    receivedOrder.getStatus(),
-                    "Order submitted successfully"
-            ));
-        }
-        catch (IllegalArgumentException e)
-        {
-            // Return a bad request response with the error message if an exception occurs.
-            return ResponseEntity.badRequest().body("Invalid order data: " + e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to submit order: " + e.getMessage());
-        }
+        orderProducerService.submitOrder(order);
+        // Retrieve the persisted order from database to confirm successful processing
+        Order receivedOrder = orderRepository.findById(order.getOrderId()).get();
+        OrderResponseDTO response = new OrderResponseDTO(
+                receivedOrder.getOrderId(),
+                receivedOrder.getProductName(),
+                receivedOrder.getQuantity(),
+                receivedOrder.getStatus(),
+                "Order submitted successfully and queued for processing"
+        );
+
+        // Return 201 CREATED to indicate resource was successfully created
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

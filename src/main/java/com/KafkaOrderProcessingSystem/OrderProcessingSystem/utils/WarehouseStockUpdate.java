@@ -25,7 +25,7 @@ public class WarehouseStockUpdate {
 
         // Fetch product stock safely
         WarehouseStock stock = warehouseRepository.findById(order.getProductName())
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new RuntimeException(
                         "Product not found: " + order.getProductName()
                 ));
 

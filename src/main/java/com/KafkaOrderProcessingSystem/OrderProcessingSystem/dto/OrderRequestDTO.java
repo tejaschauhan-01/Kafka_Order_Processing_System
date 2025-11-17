@@ -17,7 +17,7 @@ public class OrderRequestDTO {
     private String orderId;
 
     @NotBlank(message = "product  name required")
-    @Pattern(regexp = "^[A-Za-z\\s]+$", message = "product name should not be number")
+    @Pattern(regexp = "^(?!\\d+$)[A-Za-z0-9\\s]+$", message = "Product name cannot be only numbers")
     private String productName;
 
     @Min(value = 1, message = "Quantity must be at least 1")

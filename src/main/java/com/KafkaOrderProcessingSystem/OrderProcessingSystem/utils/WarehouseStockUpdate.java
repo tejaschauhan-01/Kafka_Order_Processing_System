@@ -23,11 +23,11 @@ public class WarehouseStockUpdate {
         // Log that the consumer has received an order from Kafka
         log.info("kafka consumer received order: " + order);
 
-        // Fetch product stock from a database based on product name
-        Optional<WarehouseStock> stockOptional = warehouseRepository.findById(order.getProductName());
-
-        // Retrieve the actual stock record (assuming product exists)
-        WarehouseStock stock = stockOptional.get();
+        // Fetch product stock safely
+        WarehouseStock stock = warehouseRepository.findById(order.getProductName())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Product not found: " + order.getProductName()
+                ));
 
         // Calculate the remaining stock after fulfilling the order
         int remaining = stock.getAvailableQuantity() - order.getQuantity();

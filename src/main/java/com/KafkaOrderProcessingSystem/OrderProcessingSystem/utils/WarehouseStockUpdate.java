@@ -17,7 +17,7 @@ public class WarehouseStockUpdate {
     private WarehouseRepository warehouseRepository;
 
     // Method to process the received order and update warehouse stock accordingly
-    public void processOrder(Order order) {
+    public void updateStock(Order order) {
 
         // Log that the consumer has received an order from Kafka
         log.info("kafka consumer received order: " + order);

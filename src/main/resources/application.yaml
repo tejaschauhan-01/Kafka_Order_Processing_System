@@ -1,9 +1,9 @@
 spring:
   application:
     name: OrderProcessingSystem
-# at the end this app is also image which run on container , so that we can also configure the following props in compose, but not required.
+
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}   # if app not run on docker then use the localhost:<port> otherWise container environment variables which define in compose file.
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -14,11 +14,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/warehouse_db}
-
-
-#  environment variable can access in any whare in app or container.
-
-

@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class WarehouseConsumerServiceImpl implements WarehouseConsumerService {
 
-    @Autowired
-    public WarehouseStockUpdate warehousestockupdate;
+//    @Autowired
+    public final WarehouseStockUpdate warehousestockupdate;
 
     // Kafka listener to consume order messages from the "orders" topic
     @KafkaListener(topics = "orders", groupId = "warehouse-group")
@@ -23,6 +23,6 @@ public class WarehouseConsumerServiceImpl implements WarehouseConsumerService {
     public void consumeOrder(Order order) {
         log.info("order is in progress state and ready for consumer service to update warehouse stock");
         // Process the received order and update warehouse stock accordingly
-        warehousestockupdate.processOrder(order);
+        warehousestockupdate.updateStock(order);
     }
 }

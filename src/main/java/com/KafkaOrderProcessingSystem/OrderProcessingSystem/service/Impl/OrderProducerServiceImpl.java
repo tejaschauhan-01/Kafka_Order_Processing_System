@@ -6,15 +6,19 @@ import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepo
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.WarehouseRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.OrderProducerService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
-@AllArgsConstructor
+//@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class OrderProducerServiceImpl implements OrderProducerService {
 
@@ -59,7 +63,7 @@ public class OrderProducerServiceImpl implements OrderProducerService {
             log.info("data hase been save in Order database");
 
             // Send order to a Kafka topic
-            kafkaTemplate.send(TOPIC, order.getOrderId(), order);
+            CompletableFuture<SendResult<String, Order>> a = kafkaTemplate.send(TOPIC, order.getOrderId(), order);
 
             log.info("Order saved (RECEIVED) and sent to Kafka: " + order);
         } catch (Exception e) {

@@ -5,17 +5,30 @@ services:
     image: apache/kafka:4.1.0
     container_name: kafka
     ports:
-      - "9092:9092"
-    environment: #configuration properties : - these are environment variables for config kafka (which are built in, you can customize it based on your requirements), you can also add custom variable for own use.
-
-      # Kafka Configuration
+      - "9092:9092"      # Local access for Spring Boot
+      - "19092:19092"    # Docker internal access for Kafka UI
+    environment:
+      # Kafka node configuration
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+
+      # LISTENERS: 2 listeners + controller
+      KAFKA_LISTENERS: PLAINTEXT_LOCAL://0.0.0.0:9092,PLAINTEXT_DOCKER://0.0.0.0:19092,CONTROLLER://0.0.0.0:9093
+
+      # Advertised for external/local and Docker internal
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_LOCAL://localhost:9092,PLAINTEXT_DOCKER://kafka:19092
+
+      # Listener protocol mapping
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT_LOCAL:PLAINTEXT,PLAINTEXT_DOCKER:PLAINTEXT
+
+      # Broker uses Docker listener internally
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_DOCKER
+
+      # Kraft controller config
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      # Other settings
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -31,33 +44,18 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  #  app:
-  #    build: .
-  #    container_name: kafka-order-app
-  #    ports:
-  #      - "8080:8080"
-  #    depends_on:
-  #      - kafka
-  #      - mongodb
-  #    environment:
-  #      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-  #      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/warehouse_db
-
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     ports:
-      - "8081:8080"        # access UI on http://localhost:8081
+      - "8081:8080"
     depends_on:
       - kafka
     environment:
       KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:19092
       KAFKA_CLUSTERS_0_METRICS_PORT: 9100
       KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: PLAINTEXT
 
 volumes:
   mongo-data:
-
-# we can also specify the environment variable in .env and use in compose file for safe and private purpose. so you commit compose file not .env, right!!!
-#  docker exec -it mongodb mongosh

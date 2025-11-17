@@ -5,6 +5,7 @@ import com.KafkaOrderProcessingSystem.OrderProcessingSystem.dto.OrderResponseDTO
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.Impl.OrderProducerServiceImpl;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.OrderProducerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,16 +17,16 @@ import org.springframework.web.bind.annotation.*;
 // REST controller for order processing operations.
 // Handles requests related to creating and submitting orders.
 @Tag(name = "Order Endpoints")
-@RestController
+@RestController   // means all method will return json or xml response
 @RequestMapping("/orders")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor // with final and nonnull fields constructor will be created
 public class OrderController {
     // Repository for order data access operations with mongoDB database.
     @Autowired
     private OrderRepository orderRepository;
     // Service for producing and submitting orders to Kafka broker.
     @Autowired
-    private final OrderProducerServiceImpl orderProducerService;
+    private OrderProducerService orderProducerService;
     // Endpoint to create and submit a new order.
     // Receives an OrderRequestDTO in the request body and returns a response indicating success or failure.
     @PostMapping("/create_order")

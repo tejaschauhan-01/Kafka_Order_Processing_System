@@ -6,6 +6,7 @@ import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepo
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.WarehouseRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.OrderProducerService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,23 +15,23 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class OrderProducerServiceImpl implements OrderProducerService {
 
     // Kafka template used to publish orders to the Kafka topic.
     private final KafkaTemplate<String, Order> kafkaTemplate;
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
-    @Autowired
-    private WarehouseRepository warehouseRepository;
+    private final WarehouseRepository warehouseRepository;
 
     private static final String TOPIC = "orders";  // Kafka topic name
 
     @Override
     public void submitOrder(Order order) {
+        log.info("Received order request: {}", order);
+        
         // Check if the product exists in warehouse stock
         Optional<WarehouseStock> stockOpt = warehouseRepository.findById(order.getProductName());
         if (stockOpt.isEmpty()) {

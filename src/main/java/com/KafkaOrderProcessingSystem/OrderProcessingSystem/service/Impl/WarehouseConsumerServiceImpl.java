@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class WarehouseConsumerServiceImpl implements WarehouseConsumerService {
 
-    @Autowired
-    public WarehouseStockUpdate warehousestockupdate;
+    public final WarehouseStockUpdate warehousestockupdate;
 
     // Kafka listener to consume order messages from the "orders" topic
     @KafkaListener(topics = "orders", groupId = "warehouse-group")

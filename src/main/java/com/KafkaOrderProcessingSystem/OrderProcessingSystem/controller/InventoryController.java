@@ -5,6 +5,7 @@ import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStoc
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.InventoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +17,11 @@ import java.util.List;
 @Tag(name = "Inventory Endpoints")
 @RestController
 @RequestMapping("/inventory")
+@RequiredArgsConstructor
 public class InventoryController {
 
     // Service for inventory management operations.
-    @Autowired
-    private InventoryService inventoryService;
+    private final InventoryService inventoryService;
 
     // Endpoint to add new stock to the inventory.
     // Receives a WarehouseStockDTO in the request body and returns a response indicating success or failure.

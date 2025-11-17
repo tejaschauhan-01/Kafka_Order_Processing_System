@@ -20,12 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
+
     // Repository for order data access operations with mongoDB database.
-    @Autowired
     private OrderRepository orderRepository;
+
     // Service for producing and submitting orders to Kafka broker.
-    @Autowired
     private final OrderProducerServiceImpl orderProducerService;
+
     // Endpoint to create and submit a new order.
     // Receives an OrderRequestDTO in the request body and returns a response indicating success or failure.
     @PostMapping("/create_order")

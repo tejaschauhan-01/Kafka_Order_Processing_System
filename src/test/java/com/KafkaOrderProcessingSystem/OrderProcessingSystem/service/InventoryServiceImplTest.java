@@ -75,7 +75,7 @@ public class InventoryServiceImplTest {
         when(warehouseRepository.findById("Laptop")).thenReturn(Optional.of(productStock));
         when(warehouseRepository.save(any(WarehouseStock.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        WarehouseStock updated = inventoryService.updateInventory("Laptop", "Laptop", 5);
+        WarehouseStock updated = inventoryService.updateInventory("Laptop",  5);
 
         assertEquals(15, updated.getAvailableQuantity());
         verify(warehouseRepository, times(1)).findById("Laptop");
@@ -87,7 +87,7 @@ public class InventoryServiceImplTest {
         when(warehouseRepository.findById("Laptop")).thenReturn(Optional.empty());
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> inventoryService.updateInventory("Laptop", "Laptop", 5));
+                () -> inventoryService.updateInventory("Laptop",  5));
 
         assertTrue(exception.getMessage().contains("Product not found in inventory"));
         verify(warehouseRepository, never()).save(any());

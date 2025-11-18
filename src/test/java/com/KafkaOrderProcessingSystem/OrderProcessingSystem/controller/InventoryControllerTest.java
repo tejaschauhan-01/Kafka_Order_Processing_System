@@ -97,7 +97,7 @@ class InventoryControllerTest {
         WarehouseStockDTO dto = new WarehouseStockDTO("Laptop", 15, null);
         WarehouseStock updated = new WarehouseStock("Laptop", 15);
 
-        when(inventoryService.updateInventory(eq("Laptop"), anyString(), anyInt()))
+        when(inventoryService.updateInventory(eq("Laptop"), anyInt()))
                 .thenReturn(updated);
 
         mockMvc.perform(put("/inventory/update_stock/Laptop")
@@ -113,7 +113,7 @@ class InventoryControllerTest {
     void UpdateInventory_FailureTest() throws Exception {
         WarehouseStockDTO dto = new WarehouseStockDTO("Laptop", 15, null);
 
-        when(inventoryService.updateInventory(eq("Laptop"), anyString(), anyInt()))
+        when(inventoryService.updateInventory(eq("Laptop"),  anyInt()))
                 .thenThrow(new IllegalArgumentException("Product not found"));
 
         mockMvc.perform(put("/inventory/update_stock/Laptop")

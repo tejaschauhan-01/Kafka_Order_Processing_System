@@ -21,13 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/**
- * Edge Case Testing for Order Processing System
- *
- * Industry Practice: Edge cases represent boundary conditions and unusual scenarios
- * that may not occur frequently but can cause system failures if not handled properly.
- * Testing these scenarios ensures system robustness and reliability.
- */
 @ExtendWith(MockitoExtension.class)
 class EdgeCaseTest {
 
@@ -49,10 +42,6 @@ class EdgeCaseTest {
     @InjectMocks
     private WarehouseStockUpdate warehouseStockUpdate;
 
-    /**
-     * Test Case: Order with zero quantity
-     * Edge Case: Validates system behavior when order quantity is 0
-     */
     @Test
     void testSubmitOrder_WithZeroQuantity() {
         // Given: Product exists with stock
@@ -73,10 +62,6 @@ class EdgeCaseTest {
         verify(kafkaTemplate, times(1)).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Order with negative quantity
-     * Edge Case: System should handle negative quantities gracefully
-     */
     @Test
     void testSubmitOrder_WithNegativeQuantity() {
         // Given: Product exists with stock
@@ -90,17 +75,11 @@ class EdgeCaseTest {
                 .status(OrderStatus.PENDING.name())
                 .build();
 
-        // When & Then: Negative quantity doesn't exceed stock, so it processes
-        // Note: In production, validation layer should prevent negative quantities
         assertDoesNotThrow(() -> orderProducerService.submitOrder(order));
 
         verify(orderRepository, times(1)).save(any(Order.class));
     }
 
-    /**
-     * Test Case: Very large order quantity (Integer.MAX_VALUE)
-     * Edge Case: Tests boundary of integer range
-     */
     @Test
     void testSubmitOrder_WithMaxIntegerQuantity() {
         // Given: Product with limited stock
@@ -114,7 +93,6 @@ class EdgeCaseTest {
                 .status(OrderStatus.PENDING.name())
                 .build();
 
-        // When & Then: Should fail as quantity exceeds available stock
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> orderProducerService.submitOrder(order));
 
@@ -123,10 +101,6 @@ class EdgeCaseTest {
         verify(kafkaTemplate, never()).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Order with null or empty product name
-     * Edge Case: Tests handling of invalid product identifiers
-     */
     @Test
     void testSubmitOrder_WithNullProductName() {
         // Given: Order with null product name
@@ -137,7 +111,6 @@ class EdgeCaseTest {
                 .status(OrderStatus.PENDING.name())
                 .build();
 
-        // When & Then: Should throw exception
         when(warehouseRepository.findById(null)).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class,
@@ -146,10 +119,6 @@ class EdgeCaseTest {
         assertEquals("Product not found", exception.getMessage());
     }
 
-    /**
-     * Test Case: Order with empty string product name
-     * Edge Case: Tests validation of empty strings
-     */
     @Test
     void testSubmitOrder_WithEmptyProductName() {
         // Given: Order with empty product name
@@ -169,10 +138,6 @@ class EdgeCaseTest {
         assertEquals("Product not found", exception.getMessage());
     }
 
-    /**
-     * Test Case: Order with very long product name
-     * Edge Case: Tests system with unusually long strings
-     */
     @Test
     void testSubmitOrder_WithVeryLongProductName() {
         // Given: Product name with 1000 characters
@@ -195,10 +160,6 @@ class EdgeCaseTest {
         verify(kafkaTemplate, times(1)).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Stock with exactly matching order quantity
-     * Edge Case: Boundary test where stock equals order quantity
-     */
     @Test
     void testSubmitOrder_ExactStockMatch() {
         // Given: Stock quantity exactly matches order quantity
@@ -219,10 +180,6 @@ class EdgeCaseTest {
         verify(kafkaTemplate, times(1)).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Stock with quantity one more than order
-     * Edge Case: Boundary test with minimal remaining stock
-     */
     @Test
     void testSubmitOrder_StockOneMoreThanOrder() {
         // Given: Stock is one unit more than order
@@ -243,10 +200,6 @@ class EdgeCaseTest {
         verify(kafkaTemplate, times(1)).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Stock with quantity one less than order
-     * Edge Case: Boundary test where order just exceeds stock
-     */
     @Test
     void testSubmitOrder_StockOneLessThanOrder() {
         // Given: Stock is one unit less than order
@@ -267,10 +220,6 @@ class EdgeCaseTest {
         assertTrue(exception.getMessage().contains("Order Quantity exceeds available stock"));
     }
 
-    /**
-     * Test Case: Update warehouse stock resulting in zero
-     * Edge Case: Stock reduction leaves exactly zero items
-     */
     @Test
     void testWarehouseStockUpdate_ResultsInZeroStock() {
         // Given: Stock will be reduced to zero
@@ -293,10 +242,6 @@ class EdgeCaseTest {
         verify(warehouseRepository, times(1)).save(stock);
     }
 
-    /**
-     * Test Case: Update warehouse stock resulting in negative (system error)
-     * Edge Case: Tests data inconsistency scenario
-     */
     @Test
     void testWarehouseStockUpdate_ResultsInNegativeStock() {
         // Given: Order quantity exceeds stock (data inconsistency)
@@ -319,10 +264,6 @@ class EdgeCaseTest {
         verify(warehouseRepository, times(1)).save(stock);
     }
 
-    /**
-     * Test Case: Add inventory with zero quantity
-     * Edge Case: Adding product with no stock
-     */
     @Test
     void testAddInventory_WithZeroQuantity() {
         // Given: New product with zero quantity
@@ -336,10 +277,6 @@ class EdgeCaseTest {
         verify(warehouseRepository, times(1)).save(stock);
     }
 
-    /**
-     * Test Case: Update inventory with negative quantity change
-     * Edge Case: Tests if update can handle negative adjustments
-     */
     @Test
     void testUpdateInventory_WithNegativeQuantityChange() {
         // Given: Existing product
@@ -355,10 +292,6 @@ class EdgeCaseTest {
         verify(warehouseRepository, times(1)).save(existingStock);
     }
 
-    /**
-     * Test Case: Product name with special characters
-     * Edge Case: Tests handling of special characters in identifiers
-     */
     @Test
     void testSubmitOrder_WithSpecialCharactersInProductName() {
         // Given: Product name with special characters
@@ -380,10 +313,6 @@ class EdgeCaseTest {
         verify(orderRepository, times(1)).save(any(Order.class));
     }
 
-    /**
-     * Test Case: Duplicate order ID submission
-     * Edge Case: Tests idempotency concern
-     */
     @Test
     void testSubmitOrder_DuplicateOrderId() {
         // Given: Product with sufficient stock

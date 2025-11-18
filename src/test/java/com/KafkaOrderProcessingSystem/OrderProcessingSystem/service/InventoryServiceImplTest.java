@@ -55,7 +55,6 @@ public class InventoryServiceImplTest {
     @Test
     void testGetInventory_ReturnsAllStocks() {
         List<WarehouseStock> mockList = Arrays.asList(productStock);
-        when(warehouseRepository.findAll()).thenReturn(mockList);
 
         Page<WarehouseStock> mockPage = new PageImpl<>(mockList, PageRequest.of(0, 10, Sort.by("productName")), mockList.size());
 
@@ -86,7 +85,7 @@ public class InventoryServiceImplTest {
     void testUpdateInventory_ProductNotFound_ThrowsException() {
         when(warehouseRepository.findById("Laptop")).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> inventoryService.updateInventory("Laptop",  5));
 
         assertTrue(exception.getMessage().contains("Product not found in inventory"));

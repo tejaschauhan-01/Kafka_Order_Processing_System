@@ -50,12 +50,12 @@ class OrderControllerTest {
         mockMvc.perform(post("/orders/create_order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.orderId", is("O1")))
                 .andExpect(jsonPath("$.productName", is("Laptop")))
                 .andExpect(jsonPath("$.quantity", is(5)))
                 .andExpect(jsonPath("$.status", is("PROCESSED")))
-                .andExpect(jsonPath("$.message", is("Order submitted successfully")));
+                .andExpect(jsonPath("$.message", is("Order submitted successfully and queued for processing")));
     }
 
     @Test
@@ -68,8 +68,8 @@ class OrderControllerTest {
         mockMvc.perform(post("/orders/create_order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid order data: Invalid product name"));
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").value("Invalid product name"));
+
     }
 
     @Test
@@ -83,6 +83,6 @@ class OrderControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Failed to submit order: Out of stock"));
+                .andExpect(jsonPath("$.message").value("Out of stock"));
     }
 }

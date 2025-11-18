@@ -21,16 +21,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-/**
- * Transaction Rollback Testing for Order Processing System
- * 
- * Industry Practice: Transaction tests ensure data consistency when operations fail.
- * The @Transactional annotation ensures that database operations are rolled back
- * if any exception occurs, maintaining data integrity.
- * 
- * These tests verify that the system handles failures gracefully and doesn't
- * leave the database in an inconsistent state.
- */
 @ExtendWith(MockitoExtension.class)
 class TransactionRollbackTest {
 
@@ -60,13 +50,6 @@ class TransactionRollbackTest {
                 .build();
     }
 
-    /**
-     * Test Case: Kafka send failure should not prevent order persistence
-     * Transaction Behavior: Order is saved even if Kafka fails
-     * 
-     * Note: Current implementation saves order before Kafka send, so order
-     * persists even when Kafka fails. This is by design for audit trail.
-     */
     @Test
     void testKafkaSendFailure_OrderStillPersisted() {
         // Given: Stock is available but Kafka will fail
@@ -85,10 +68,6 @@ class TransactionRollbackTest {
         verify(orderRepository, times(1)).save(any(Order.class));
     }
 
-    /**
-     * Test Case: Database save failure during order processing
-     * Transaction Behavior: Operation should fail without sending to Kafka
-     */
     @Test
     void testOrderSaveFailure_NoKafkaSend() {
         // Given: Stock is available but database save will fail
@@ -106,10 +85,6 @@ class TransactionRollbackTest {
         verify(kafkaTemplate, never()).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Stock check failure should prevent order processing
-     * Transaction Behavior: No side effects when stock lookup fails
-     */
     @Test
     void testStockCheckFailure_NoOrderCreated() {
         // Given: Warehouse repository throws exception
@@ -127,10 +102,6 @@ class TransactionRollbackTest {
         verify(kafkaTemplate, never()).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Out of stock scenario transaction handling
-     * Transaction Behavior: Order is saved with FAILED status but not sent to Kafka
-     */
     @Test
     void testOutOfStock_PartialTransaction() {
         // Given: Product is out of stock
@@ -153,10 +124,6 @@ class TransactionRollbackTest {
         verify(kafkaTemplate, never()).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Quantity exceeds stock transaction handling
-     * Transaction Behavior: Order saved as FAILED, no Kafka message
-     */
     @Test
     void testQuantityExceedsStock_PartialTransaction() {
         // Given: Order quantity exceeds available stock
@@ -179,10 +146,6 @@ class TransactionRollbackTest {
         verify(kafkaTemplate, never()).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Successful order processing - complete transaction
-     * Transaction Behavior: All operations complete successfully
-     */
     @Test
     void testSuccessfulOrder_CompleteTransaction() {
         // Given: All conditions are met for successful order
@@ -205,10 +168,6 @@ class TransactionRollbackTest {
         verify(kafkaTemplate, times(1)).send(eq("orders"), eq("TXN001"), any(Order.class));
     }
 
-    /**
-     * Test Case: Multiple save calls during failure scenarios
-     * Transaction Behavior: Verify order is saved only once per failure
-     */
     @Test
     void testMultipleSaveCallsPrevention() {
         // Given: Out of stock condition
@@ -224,10 +183,6 @@ class TransactionRollbackTest {
         verify(orderRepository, times(1)).save(any(Order.class));
     }
 
-    /**
-     * Test Case: Concurrent order submission simulation
-     * Transaction Behavior: Each order should be handled independently
-     */
     @Test
     void testConcurrentOrderHandling() {
         // Given: Multiple orders for the same product
@@ -257,10 +212,6 @@ class TransactionRollbackTest {
         verify(kafkaTemplate, times(2)).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Product not found exception handling
-     * Transaction Behavior: No database writes when product doesn't exist
-     */
     @Test
     void testProductNotFound_NoTransaction() {
         // Given: Product doesn't exist in warehouse
@@ -285,10 +236,6 @@ class TransactionRollbackTest {
         verify(kafkaTemplate, never()).send(anyString(), anyString(), any(Order.class));
     }
 
-    /**
-     * Test Case: Order status update verification in failure scenarios
-     * Transaction Behavior: Failed orders should have correct status
-     */
     @Test
     void testFailedOrderStatusCorrectness() {
         // Given: Insufficient stock scenario
@@ -312,10 +259,6 @@ class TransactionRollbackTest {
         ));
     }
 
-    /**
-     * Test Case: Idempotency check for order processing
-     * Transaction Behavior: Same order processed twice should behave consistently
-     */
     @Test
     void testOrderIdempotency() {
         // Given: Valid order and stock
@@ -331,4 +274,3 @@ class TransactionRollbackTest {
         verify(kafkaTemplate, times(2)).send(anyString(), anyString(), any(Order.class));
     }
 }
-

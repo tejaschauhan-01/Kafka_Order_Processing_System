@@ -5,13 +5,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-// DTO for Warehouse Stock, common for both request and response.
 @JsonIgnoreProperties(ignoreUnknown = false)
 public class WarehouseStockDTO {
 

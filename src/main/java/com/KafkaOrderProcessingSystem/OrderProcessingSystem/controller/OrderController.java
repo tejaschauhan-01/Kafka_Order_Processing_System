@@ -33,23 +33,26 @@ public class OrderController {
     @PostMapping("/create_order")
     public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO) {
 
-        // Map DTO to entity (following DTO pattern for clean separation)
-        Order order = new Order(
-                orderRequestDTO.getOrderId(),
-                orderRequestDTO.getProductName(),
-                orderRequestDTO.getQuantity(),
-                orderRequestDTO.getStatus()
-        );
+        // Map DTO to entity using builder pattern (more readable than constructor)
+        Order order = Order.builder()
+                .orderId(orderRequestDTO.getOrderId())
+                .productName(orderRequestDTO.getProductName())
+                .quantity(orderRequestDTO.getQuantity())
+                .status(orderRequestDTO.getStatus())
+                .build();
+
         orderProducerService.submitOrder(order);
         // Retrieve the persisted order from database to confirm successful processing
         Order receivedOrder = orderRepository.findById(order.getOrderId()).get();
-        OrderResponseDTO response = new OrderResponseDTO(
-                receivedOrder.getOrderId(),
-                receivedOrder.getProductName(),
-                receivedOrder.getQuantity(),
-                receivedOrder.getStatus(),
-                "Order submitted successfully and queued for processing"
-        );
+
+        // Build response using builder pattern for clarity
+        OrderResponseDTO response = OrderResponseDTO.builder()
+                .orderId(receivedOrder.getOrderId())
+                .productName(receivedOrder.getProductName())
+                .quantity(receivedOrder.getQuantity())
+                .status(receivedOrder.getStatus())
+                .message("Order submitted successfully and queued for processing")
+                .build();
 
         // Return 201 CREATED to indicate resource was successfully created
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

@@ -32,19 +32,21 @@ public class InventoryController {
     @PostMapping("/add_stock")
     public ResponseEntity<WarehouseStockDTO> addInventory(@Valid @RequestBody WarehouseStockDTO warehouseStockDTO) {
 
-        // Map DTO to entity (following DTO pattern for layer separation)
-        WarehouseStock warehouseStock = new WarehouseStock(
-                warehouseStockDTO.getProductName(),
-                warehouseStockDTO.getAvailableQuantity()
-        );
+        // Map DTO to entity using builder pattern (more readable and maintainable)
+        WarehouseStock warehouseStock = WarehouseStock.builder()
+                .productName(warehouseStockDTO.getProductName())
+                .availableQuantity(warehouseStockDTO.getAvailableQuantity())
+                .build();
 
         inventoryService.addInventory(warehouseStock);
-        // Build success response
-        WarehouseStockDTO response = new WarehouseStockDTO(
-                warehouseStockDTO.getProductName(),
-                warehouseStockDTO.getAvailableQuantity(),
-                "Stock added successfully"
-        );
+
+        // Build success response using builder pattern
+        WarehouseStockDTO response = WarehouseStockDTO.builder()
+                .productName(warehouseStockDTO.getProductName())
+                .availableQuantity(warehouseStockDTO.getAvailableQuantity())
+                .message("Stock added successfully")
+                .build();
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -73,11 +75,11 @@ public class InventoryController {
                 warehouseStockDTO.getAvailableQuantity()
         );
         // Build success response with updated details
-        WarehouseStockDTO response = new WarehouseStockDTO(
-                updatedStock.getProductName(),
-                updatedStock.getAvailableQuantity(),
-                "Inventory updated successfully"
-        );
+        WarehouseStockDTO response = WarehouseStockDTO.builder()
+                .productName(updatedStock.getProductName())
+                .availableQuantity(updatedStock.getAvailableQuantity())
+                .message("Stock updated successfully")
+                .build();
 
         // Return 200 OK with updated stock details
         return ResponseEntity.ok(response);

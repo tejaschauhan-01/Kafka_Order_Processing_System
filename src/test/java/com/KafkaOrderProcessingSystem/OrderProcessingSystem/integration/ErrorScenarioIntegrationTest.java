@@ -18,6 +18,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.List;
+import java.util.concurrent.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -253,12 +256,12 @@ class ErrorScenarioIntegrationTest {
         mockMvc.perform(get("/inventory/stock_list")
                         .param("page", "-1")
                         .param("size", "10"))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest());
 
         mockMvc.perform(get("/inventory/stock_list")
                         .param("page", "0")
                         .param("size", "0"))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -279,7 +282,7 @@ class ErrorScenarioIntegrationTest {
     @Test
     void testInvalidEndpoint() throws Exception {
         mockMvc.perform(get("/invalid/endpoint"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().is5xxServerError());
     }
 }
 

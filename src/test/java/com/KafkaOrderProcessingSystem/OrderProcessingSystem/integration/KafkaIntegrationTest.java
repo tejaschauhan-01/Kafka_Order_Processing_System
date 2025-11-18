@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@EmbeddedKafka(partitions = 1, topics = {"orders"}, ports = {9092})
+@EmbeddedKafka(partitions = 1, topics = {"orders"}, ports = {9098})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class KafkaIntegrationTest {
 

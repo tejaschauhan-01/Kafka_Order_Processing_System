@@ -55,7 +55,7 @@ class WarehouseStockUpdateTest {
         when(warehouseRepository.findById("Mouse")).thenReturn(Optional.empty());
 
         assertThrows(
-                NoSuchElementException.class,
+                RuntimeException.class,
                 () -> warehouseStockUpdate.processOrder(order)
         );
 

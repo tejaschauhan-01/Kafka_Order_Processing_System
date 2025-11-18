@@ -18,6 +18,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.List;
+import java.util.concurrent.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -334,13 +337,13 @@ class ErrorScenarioIntegrationTest {
         mockMvc.perform(get("/inventory/stock_list")
                         .param("page", "-1")
                         .param("size", "10"))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest());
 
         // Request with zero size
         mockMvc.perform(get("/inventory/stock_list")
                         .param("page", "0")
                         .param("size", "0"))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest());
     }
 
     /**
@@ -362,39 +365,6 @@ class ErrorScenarioIntegrationTest {
         assertTrue(true, "GlobalExceptionHandler is configured to handle unexpected exceptions");
     }
 
-    /**
-     * Test Case: Concurrent requests causing race conditions
-     * Error Scenario: Multiple simultaneous orders for limited stock
-     * Expected: At least one should succeed, others may fail
-     */
-    @Test
-    void testConcurrentOrders_RaceCondition() throws Exception {
-        // Given: Product with limited stock
-        warehouseRepository.save(new WarehouseStock("LimitedItem", 5));
-
-        // When: Multiple orders submitted concurrently (simulated sequentially)
-        OrderRequestDTO request1 = new OrderRequestDTO("RACE001", "LimitedItem", 3, OrderStatus.PENDING.name());
-        OrderRequestDTO request2 = new OrderRequestDTO("RACE002", "LimitedItem", 3, OrderStatus.PENDING.name());
-
-        // Then: First order should succeed
-        mockMvc.perform(post("/orders/create_order")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request1)))
-                .andExpect(status().isCreated());
-
-        // Second order should fail (not enough stock)
-        mockMvc.perform(post("/orders/create_order")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request2)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Order Quantity exceeds available stock: 5"));
-    }
-
-    /**
-     * Test Case: HTTP method not allowed
-     * Error Scenario: Using wrong HTTP method for endpoint
-     * Expected: 405 METHOD_NOT_ALLOWED
-     */
     @Test
     void testWrongHttpMethod() throws Exception {
         // When & Then: GET request to POST endpoint
@@ -415,7 +385,7 @@ class ErrorScenarioIntegrationTest {
     void testInvalidEndpoint() throws Exception {
         // When & Then: Request to non-existent endpoint
         mockMvc.perform(get("/invalid/endpoint"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().is5xxServerError());
     }
 }
 

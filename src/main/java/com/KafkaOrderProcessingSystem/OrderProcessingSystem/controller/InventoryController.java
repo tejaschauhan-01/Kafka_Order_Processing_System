@@ -50,10 +50,11 @@ public class InventoryController {
 
     // Endpoint to retrieve the list of all stock items in the inventory.
     @GetMapping("/stock_list")
-    public ResponseEntity<?> getInventory(){
-        // Fetch the list of warehouse stocks from the inventory service.
-        List <WarehouseStock> stocks = inventoryService.getInventory();
-        return ResponseEntity.ok().body(stocks);
+    public ResponseEntity<?> getInventory(@RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size,
+                                          @RequestParam(defaultValue = "productName") String sortBy){
+        // Fetch and return the list of warehouse stocks from the inventory service.
+        return ResponseEntity.ok(inventoryService.getInventory(page, size, sortBy));
     }
 
     // Endpoint to update the stock of a specific product in the inventory.

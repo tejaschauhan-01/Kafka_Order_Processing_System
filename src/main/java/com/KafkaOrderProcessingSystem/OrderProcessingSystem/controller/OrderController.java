@@ -21,9 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OrderController {
 
-    // Repository for order data access operations with mongoDB database.
-    private OrderRepository orderRepository;
-
     // Service for producing and submitting orders to Kafka broker.
     private final OrderProducerServiceImpl orderProducerService;
 
@@ -40,12 +37,12 @@ public class OrderController {
         try{
             // Submit the order using the order producer service.
             orderProducerService.submitOrder(order);
-            Order receivedOrder = orderRepository.findById(order.getOrderId()).get();
+            order.setStatus("PROCESSED");
             return ResponseEntity.ok(new OrderResponseDTO(
-                    receivedOrder.getOrderId(),
-                    receivedOrder.getProductName(),
-                    receivedOrder.getQuantity(),
-                    receivedOrder.getStatus(),
+                    order.getOrderId(),
+                    order.getProductName(),
+                    order.getQuantity(),
+                    order.getStatus(),
                     "Order submitted successfully"
             ));
         }

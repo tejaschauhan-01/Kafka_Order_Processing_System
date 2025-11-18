@@ -2,15 +2,15 @@ package com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.Impl;
 
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStock;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.exception.OrderProcessingException;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.WarehouseRepository;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.OrderProducerService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -29,17 +29,13 @@ public class OrderProducerServiceImpl implements OrderProducerService {
     private static final String TOPIC = "orders";  // Kafka topic name
 
     @Override
+    @Transactional
     public void submitOrder(Order order) {
         log.info("Received order request: {}", order);
         
         // Check if the product exists in warehouse stock
-        Optional<WarehouseStock> stockOpt = warehouseRepository.findById(order.getProductName());
-        if (stockOpt.isEmpty()) {
-            throw new RuntimeException("Product not found");
-        }
-
-        // Retrieve the existing product record
-        WarehouseStock stock = stockOpt.get();
+        WarehouseStock stock = warehouseRepository.findById(order.getProductName())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
         // Check if the product is out of stock
         if (stock.getAvailableQuantity() <= 0) {
@@ -57,16 +53,14 @@ public class OrderProducerServiceImpl implements OrderProducerService {
         }
 
         try {
-            log.info("data hase been save in Order database");
-
-            // Send order to a Kafka topic
             kafkaTemplate.send(TOPIC, order.getOrderId(), order);
+            log.info("Order saved (RECEIVED) and sent to Kafka: {}", order);
 
-            log.info("Order saved (RECEIVED) and sent to Kafka: " + order);
         } catch (Exception e) {
-            log.info("error is the " + e.getMessage());
-            throw new RuntimeException(e.getMessage());
+            log.error("Failed to send order to Kafka: orderId={}", order.getOrderId(), e);
+            throw new OrderProcessingException("Failed to submit order to Kafka", e);
         }
+
     }
 
     // Helper method to handle setting order status and error messages

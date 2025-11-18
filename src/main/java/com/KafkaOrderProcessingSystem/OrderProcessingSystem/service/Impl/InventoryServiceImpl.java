@@ -5,7 +5,12 @@ import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.Warehouse
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +22,7 @@ public class InventoryServiceImpl implements InventoryService {
     private final WarehouseRepository warehouseRepository;
 
     @Override
+    @Transactional
     public void addInventory(WarehouseStock warehouseStock) {
         // Check if a product with the same name already exists
         Optional<WarehouseStock> existingProduct = warehouseRepository.findById(warehouseStock.getProductName());
@@ -28,30 +34,24 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<WarehouseStock> getInventory() {
+    public Page<WarehouseStock> getInventory(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         // Retrieve all products from inventory
-        List<WarehouseStock> stock = warehouseRepository.findAll();
-        return stock;
+        return warehouseRepository.findAll(pageable);
     }
 
     @Override
+    @Transactional
     public WarehouseStock updateInventory(String existingProductName, String newProductName, int additionalQuantity) {
         // Check if the existing product is present in inventory
-        Optional<WarehouseStock> existingOpt = warehouseRepository.findById(existingProductName);
-        if (existingOpt.isEmpty()) {
-            throw new IllegalArgumentException("Product not found in inventory: " + existingProductName);
-        }
-
-        // Get the existing product record
-        WarehouseStock existing = existingOpt.get();
+        WarehouseStock existing = warehouseRepository.findById(existingProductName)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Product not found in inventory: " + existingProductName));
 
         // Increase the available quantity by the additional amount
         existing.setAvailableQuantity(existing.getAvailableQuantity() + additionalQuantity);
 
         // Save updated product details to a database
-
         return warehouseRepository.save(existing);
     }
-
-
 }

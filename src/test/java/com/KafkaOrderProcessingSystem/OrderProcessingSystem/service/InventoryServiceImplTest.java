@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,11 +57,17 @@ public class InventoryServiceImplTest {
         List<WarehouseStock> mockList = Arrays.asList(productStock);
         when(warehouseRepository.findAll()).thenReturn(mockList);
 
-        List<WarehouseStock> result = inventoryService.getInventory();
+        Page<WarehouseStock> mockPage = new PageImpl<>(mockList, PageRequest.of(0, 10, Sort.by("productName")), mockList.size());
 
-        assertEquals(1, result.size());
-        assertEquals("Laptop", result.get(0).getProductName());
-        verify(warehouseRepository, times(1)).findAll();
+        when(warehouseRepository.findAll(any(Pageable.class))).thenReturn(mockPage);
+
+        Page<WarehouseStock> result = inventoryService.getInventory(0, 10, "productName");
+
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Laptop", result.getContent().get(0).getProductName());
+        assertEquals(10, result.getPageable().getPageSize());
+        assertEquals(0, result.getPageable().getPageNumber());
+        verify(warehouseRepository, times(1)).findAll(any(Pageable.class));
     }
 
     @Test

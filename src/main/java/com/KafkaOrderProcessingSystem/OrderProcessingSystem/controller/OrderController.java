@@ -43,6 +43,7 @@ public class OrderController {
 
         orderProducerService.submitOrder(order);
         // Retrieve the persisted order from database to confirm successful processing
+       order.setStatus("PROCESSED");
         Order receivedOrder = orderRepository.findById(order.getOrderId()).get();
 
         // Build response using builder pattern for clarity

@@ -55,9 +55,11 @@ public class InventoryController {
             description = "Retrieves a complete list of all products in the warehouse inventory"
     )
     @GetMapping("/stock_list")
-    public ResponseEntity<List<WarehouseStock>> getInventory() {
-        List<WarehouseStock> stocks = inventoryService.getInventory();
-        return ResponseEntity.ok(stocks);
+    public ResponseEntity<?> getInventory(@RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size,
+                                          @RequestParam(defaultValue = "productName") String sortBy){
+        // Fetch and return the list of warehouse stocks from the inventory service.
+        return ResponseEntity.ok(inventoryService.getInventory(page, size, sortBy));
     }
 
     @Operation(

@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -76,12 +78,18 @@ class InventoryControllerTest {
                 new WarehouseStock("Mouse", 20)
         );
 
-        when(inventoryService.getInventory()).thenReturn(stocks);
+        Page<WarehouseStock> pageResponse = new PageImpl<>(stocks);
 
-        mockMvc.perform(get("/inventory/stock_list"))
+        when(inventoryService.getInventory(1,10, "productName")).thenReturn(pageResponse);
+
+        mockMvc.perform(get("/inventory/stock_list")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "productName"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].productName").value("Laptop"))
-                .andExpect(jsonPath("$[1].productName").value("Mouse"));
+                .andExpect(jsonPath("$[1].productName").value("Mouse"))
+                .andExpect(jsonPath("$.totalElements").value(2));
     }
 
     @Test

@@ -34,13 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Integration test for Kafka Producer-Consumer flow.
- * Tests the complete end-to-end flow of order processing through Kafka.
- *
- * Industry Practice: Integration tests verify that multiple components work together correctly.
- * This test uses EmbeddedKafka to simulate a real Kafka environment without external dependencies.
- */
 @SpringBootTest
 @EmbeddedKafka(partitions = 1, topics = {"orders"}, ports = {9092})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -100,10 +93,6 @@ class KafkaIntegrationTest {
         }
     }
 
-    /**
-     * Test Case: Successful order processing through Kafka
-     * Verifies that order is sent to Kafka and can be consumed successfully
-     */
     @Test
     void testOrderProducerConsumerFlow_Success() throws InterruptedException {
         // Given: A product with sufficient stock
@@ -134,10 +123,6 @@ class KafkaIntegrationTest {
         assertEquals(OrderStatus.PROCESSED.name(), savedOrder.get().getStatus());
     }
 
-    /**
-     * Test Case: Failed order due to out of stock
-     * Verifies error handling when stock is insufficient
-     */
     @Test
     void testOrderProducerFlow_OutOfStock() throws InterruptedException {
         // Given: A product with zero stock
@@ -163,10 +148,6 @@ class KafkaIntegrationTest {
         assertEquals(OrderStatus.FAILED.name(), savedOrder.get().getStatus());
     }
 
-    /**
-     * Test Case: Failed order due to quantity exceeds available stock
-     * Verifies validation logic for order quantity
-     */
     @Test
     void testOrderProducerFlow_QuantityExceedsStock() {
         // Given: A product with limited stock
@@ -192,13 +173,8 @@ class KafkaIntegrationTest {
         assertEquals(OrderStatus.FAILED.name(), savedOrder.get().getStatus());
     }
 
-    /**
-     * Test Case: Consumer updates warehouse stock after processing order
-     * Verifies the complete flow including stock deduction
-     */
     @Test
     void testConsumerUpdatesWarehouseStock() {
-        // Given: A product with stock
         WarehouseStock stock = new WarehouseStock("Monitor", 20);
         warehouseRepository.save(stock);
 
@@ -209,27 +185,20 @@ class KafkaIntegrationTest {
                 .status(OrderStatus.PROCESSED.name())
                 .build();
 
-        // When: Consumer processes the order
         warehouseStockUpdate.processOrder(order);
 
-        // Then: Stock should be reduced
         Optional<WarehouseStock> updatedStock = warehouseRepository.findById("Monitor");
         assertTrue(updatedStock.isPresent());
         assertEquals(15, updatedStock.get().getAvailableQuantity(),
             "Stock should be reduced by order quantity");
     }
 
-    /**
-     * Test Case: Multiple orders in sequence
-     * Verifies that system can handle multiple consecutive orders
-     */
     @Test
     void testMultipleOrdersSequentially() throws InterruptedException {
         // Given: A product with sufficient stock
         WarehouseStock stock = new WarehouseStock("Tablet", 50);
         warehouseRepository.save(stock);
 
-        // When: Multiple orders are submitted
         for (int i = 1; i <= 3; i++) {
             Order order = Order.builder()
                     .orderId("TEST00" + (4 + i))
@@ -240,21 +209,15 @@ class KafkaIntegrationTest {
             orderProducerService.submitOrder(order);
         }
 
-        // Then: All orders should be published to Kafka
         for (int i = 0; i < 3; i++) {
             ConsumerRecord<String, Order> record = records.poll(10, TimeUnit.SECONDS);
             assertNotNull(record, "Message " + (i + 1) + " should be received");
             assertEquals(OrderStatus.PROCESSED.name(), record.value().getStatus());
         }
 
-        // Verify all orders are persisted
         assertEquals(3, orderRepository.count());
     }
 
-    /**
-     * Test Case: Product not found in warehouse
-     * Verifies error handling when product doesn't exist
-     */
     @Test
     void testOrderProducerFlow_ProductNotFound() {
         // Given: No product in warehouse
@@ -265,13 +228,11 @@ class KafkaIntegrationTest {
                 .status(OrderStatus.PENDING.name())
                 .build();
 
-        // When & Then: Order submission should fail
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> orderProducerService.submitOrder(order));
 
         assertEquals("Product not found", exception.getMessage());
 
-        // Verify order is not saved when product doesn't exist
         Optional<Order> savedOrder = orderRepository.findById("TEST008");
         assertFalse(savedOrder.isPresent());
     }

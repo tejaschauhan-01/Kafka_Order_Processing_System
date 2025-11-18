@@ -10,11 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -27,25 +29,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(InventoryController.class)
 @Import(GlobalExceptionHandler.class)
-
 class InventoryControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockitoBean
     private InventoryService inventoryService;
 
-    @InjectMocks
-    private InventoryController inventoryController;
-
+    @Autowired
     private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(inventoryController).build();
-        objectMapper = new ObjectMapper();
-    }
 
     @Test
     void AddInventory_SuccessTest() throws Exception {
@@ -88,15 +81,15 @@ class InventoryControllerTest {
 
         Page<WarehouseStock> pageResponse = new PageImpl<>(stocks);
 
-        when(inventoryService.getInventory(1,10, "productName")).thenReturn(pageResponse);
+        when(inventoryService.getInventory(0,10, "productName")).thenReturn(pageResponse);
 
         mockMvc.perform(get("/inventory/stock_list")
                         .param("page", "0")
                         .param("size", "10")
                         .param("sortBy", "productName"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].productName").value("Laptop"))
-                .andExpect(jsonPath("$[1].productName").value("Mouse"))
+                .andExpect(jsonPath("$.content[0].productName").value("Laptop"))
+                .andExpect(jsonPath("$.content[1].productName").value("Mouse"))
                 .andExpect(jsonPath("$.totalElements").value(2));
     }
 

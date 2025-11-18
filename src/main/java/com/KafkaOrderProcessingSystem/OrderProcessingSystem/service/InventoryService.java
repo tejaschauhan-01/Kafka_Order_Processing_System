@@ -12,5 +12,5 @@ public interface InventoryService {
 
     List<WarehouseStock> getInventory();
 
-    WarehouseStock updateInventory(String existingProductName, String newProductName, int additionalQuantity);
+    WarehouseStock updateInventory(String existingProductName, int additionalQuantity);
 }

@@ -71,7 +71,6 @@ public class InventoryController {
             @PathVariable String productName) {
         WarehouseStock updatedStock = inventoryService.updateInventory(
                 productName,
-                warehouseStockDTO.getProductName(),
                 warehouseStockDTO.getAvailableQuantity()
         );
         // Build success response with updated details

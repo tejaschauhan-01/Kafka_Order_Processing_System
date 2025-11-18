@@ -35,7 +35,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public WarehouseStock updateInventory(String existingProductName, String newProductName, int additionalQuantity) {
+    public WarehouseStock updateInventory(String existingProductName, int additionalQuantity) {
         // Check if the existing product is present in inventory
         Optional<WarehouseStock> existingOpt = warehouseRepository.findById(existingProductName);
         if (existingOpt.isEmpty()) {

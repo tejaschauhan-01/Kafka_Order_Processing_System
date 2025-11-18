@@ -13,5 +13,5 @@ public interface InventoryService {
 
     Page<WarehouseStock> getInventory(int page, int size, String sortBy);
 
-    WarehouseStock updateInventory(String existingProductName, String newProductName, int additionalQuantity);
+    WarehouseStock updateInventory(String existingProductName, int additionalQuantity);
 }

@@ -1,6 +1,7 @@
 package com.KafkaOrderProcessingSystem.OrderProcessingSystem.service.Impl;
 
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.Order;
+import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.OrderStatus;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.entity.WarehouseStock;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.exception.OrderProcessingException;
 import com.KafkaOrderProcessingSystem.OrderProcessingSystem.repository.OrderRepository;
@@ -39,33 +40,38 @@ public class OrderProducerServiceImpl implements OrderProducerService {
 
         // Check if the product is out of stock
         if (stock.getAvailableQuantity() <= 0) {
-            handleOrderStatus(order, "FAILED", "Out of Stock", true);
+            handleOrderStatus(order, OrderStatus.FAILED, "Out of Stock", true);
         }
         // Check if requested quantity exceeds available stock
         else if (order.getQuantity() > stock.getAvailableQuantity()) {
-            handleOrderStatus(order, "FAILED",
+            handleOrderStatus(order, OrderStatus.FAILED,
                     "Order Quantity exceeds available stock: " + stock.getAvailableQuantity(),
                     true);
         }
         // Otherwise, mark order as processed successfully
         else {
-            handleOrderStatus(order, "PROCESSED", null, false);
+            handleOrderStatus(order, OrderStatus.PROCESSED, null, false);
         }
 
         try {
+            log.info("data has been saved in Order database");
+
+            // Send order to a Kafka topic
             kafkaTemplate.send(TOPIC, order.getOrderId(), order);
             log.info("Order saved (RECEIVED) and sent to Kafka: {}", order);
 
         } catch (Exception e) {
-            log.error("Failed to send order to Kafka: orderId={}", order.getOrderId(), e);
-            throw new OrderProcessingException("Failed to submit order to Kafka", e);
+            log.error("Error while sending order to Kafka: {}", e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
         }
 
     }
 
     // Helper method to handle setting order status and error messages
-    private void handleOrderStatus(Order order, String status, String message, boolean throwException) {
-        order.setStatus(status);
+    // Industry practice: keep method responsibilities small, persist and optionally signal error
+    private void handleOrderStatus(Order order, OrderStatus status, String message, boolean throwException) {
+        // Persist status as String to be compatible with current DB schema
+        order.setStatus(status.name());
         orderRepository.save(order);
 
         if (throwException) {

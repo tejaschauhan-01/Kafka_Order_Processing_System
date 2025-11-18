@@ -42,11 +42,15 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public WarehouseStock updateInventory(String existingProductName, String newProductName, int additionalQuantity) {
+    public WarehouseStock updateInventory(String existingProductName, int additionalQuantity) {
         // Check if the existing product is present in inventory
-        WarehouseStock existing = warehouseRepository.findById(existingProductName)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Product not found in inventory: " + existingProductName));
+        Optional<WarehouseStock> existingOpt = warehouseRepository.findById(existingProductName);
+        if (existingOpt.isEmpty()) {
+            throw new RuntimeException("Product not found in inventory: " + existingProductName);
+        }
+
+        // Get the existing product record
+        WarehouseStock existing = existingOpt.get();
 
         // Increase the available quantity by the additional amount
         existing.setAvailableQuantity(existing.getAvailableQuantity() + additionalQuantity);
